@@ -24,3 +24,7 @@
 .btn:hover {
   @apply bg-indigo-600;
 }
+
+input[type='file'] {
+  display: none;
+}

@@ -3,6 +3,7 @@ import avatar from '../assets/profile.png';
 import { useFormik } from 'formik';
 import { validatePassword } from '../helpers/validate';
 import { FaEye } from 'react-icons/fa';
+import { FaEyeSlash } from 'react-icons/fa';
 
 import styles from '../styles/Username.module.css';
 import { useState } from 'react';
@@ -49,10 +50,10 @@ function Password() {
                   placeholder="Password"
                 />
                 <span
-                  className="absolute inset-y-0 flex items-center cursor-pointer right-3"
+                  className="absolute inset-y-0 flex items-center text-gray-500 cursor-pointer right-3"
                   onClick={showPassword}
                 >
-                  <FaEye />
+                  {isShowPassword ? <FaEyeSlash /> : <FaEye />}
                 </span>
               </div>
               <button className={styles.btn} type="submit">

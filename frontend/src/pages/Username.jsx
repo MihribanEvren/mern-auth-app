@@ -40,7 +40,7 @@ function Username() {
                 placeholder="Username"
               />
               <button className={styles.btn} type="submit">
-                Let`s Go
+                {`Let's Go`}
               </button>
             </div>
 
