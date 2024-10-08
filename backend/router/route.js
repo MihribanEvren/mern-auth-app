@@ -10,7 +10,7 @@ import {
   verifyOTP,
 } from '../controllers/app.controller.js';
 import { verifyUser } from '../middleware/verifyUser.js';
-import { authenticate } from '../middleware/authenticate.js';
+import { authenticate, localVariables } from '../middleware/authenticate.js';
 const router = Router();
 
 // POST Methods
@@ -25,13 +25,13 @@ router.post('/login', verifyUser, login);
 
 // GET Methods
 router.get('/user/:username', getUser);
-router.get('/generateOTP', generateOTP);
-router.get('/verifyOTP', verifyOTP);
-router.get('/resetSession', resetSession);
+router.get('/generateotp', verifyUser, localVariables, generateOTP);
+router.get('/verifyotp', verifyOTP);
+router.get('/resetsession', resetSession);
 
 // PUT Methods
 router.put('/user', authenticate, updateUser);
 
-router.put('/password/reset', resetPassword);
+router.put('/resetpassword', verifyUser, resetPassword);
 
 export default router;

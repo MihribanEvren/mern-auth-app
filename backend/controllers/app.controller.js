@@ -2,8 +2,10 @@ import User from '../model/User.model.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
+import otpGenerator from 'otp-generator';
 
-// POST
+// POST http://localhost:5000/api/register
+// Register a new user
 export async function register(req, res) {
   const { username, email, password, profile } = req.body;
   if (!username || !email || !password) {
@@ -33,6 +35,8 @@ export async function register(req, res) {
   }
 }
 
+// POST http://localhost:5000/api/login
+// Authenticate user and return a token
 export async function login(req, res) {
   const { username, password } = req.body;
 
@@ -59,7 +63,8 @@ export async function login(req, res) {
   }
 }
 
-// GET
+// GET http://localhost:5000/api/user/:username
+// Get a user
 export async function getUser(req, res) {
   const { username } = req.params;
   if (!username) {
@@ -80,19 +85,8 @@ export async function getUser(req, res) {
   }
 }
 
-export async function generateOTP(req, res) {
-  res.json('Hello World');
-}
-
-export async function verifyOTP(req, res) {
-  res.json('Hello World');
-}
-
-export async function resetSession(req, res) {
-  res.json('Hello World');
-}
-
-// PUT
+// PUT http://localhost:5000/api/user
+// Update a user
 export async function updateUser(req, res) {
   //   const { id } = req.query;
   const { userId } = req.user;
@@ -117,6 +111,56 @@ export async function updateUser(req, res) {
   }
 }
 
+// GET http://localhost:5000/api/generateotp
+export async function generateOTP(req, res) {
+  req.app.locals.OTP = await otpGenerator.generate(6, {
+    upperCaseAlphabets: false,
+    lowerCaseAlphabets: false,
+    specialChars: false,
+    alphabets: false,
+  });
+  return res.status(201).json({ code: req.app.locals.OTP });
+}
+
+// GET http://localhost:5000/api/verifyotp
+export async function verifyOTP(req, res) {
+  const { code } = req.query;
+  if (parseInt(req.app.locals.OTP) === parseInt(code)) {
+    req.app.locals.OTP = null;
+    req.app.locals.resetSession = true;
+    return res.status(201).json({ message: 'OTP verified successfully' });
+  }
+  return res.status(400).json({ message: 'Invalid OTP' });
+}
+
+// GET http://localhost:5000/api/resetsession
+// succesfully redirect user when OTP is reset
+export async function resetSession(req, res) {
+  if (req.app.locals.resetSession) {
+    req.app.locals.resetSession = false;
+    return res.status(201).json({ message: 'Access Granted' });
+  }
+  return res.status(440).json({ message: 'Session expired' });
+}
+
+// PUT http://localhost:5000/api/resetpassword
+// Reset user password
 export async function resetPassword(req, res) {
-  res.json('Hello World');
+  const { username, password } = req.body;
+  try {
+    if (!req.app.locals.resetSession)
+      return res.status(440).json({ message: 'Session expired' });
+    const user = await User.findOne({ username });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    user.password = await bcrypt.hash(password, 10);
+
+    await user.save();
+
+    return res.status(201).json({ message: 'Password reset successful' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Server Error' });
+  }
 }

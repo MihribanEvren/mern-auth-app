@@ -18,3 +18,11 @@ export function authenticate(req, res, next) {
     res.status(403).json({ message: 'Invalid or expired token' });
   }
 }
+
+export function localVariables(req, res, next) {
+  res.app.locals = {
+    OTP: null,
+    resetSession: false,
+  };
+  next();
+}
