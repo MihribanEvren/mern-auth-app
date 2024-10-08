@@ -9,6 +9,8 @@ import {
   updateUser,
   verifyOTP,
 } from '../controllers/app.controller.js';
+import { verifyUser } from '../middleware/verifyUser.js';
+import { authenticate } from '../middleware/authenticate.js';
 const router = Router();
 
 // POST Methods
@@ -16,10 +18,10 @@ router.post('/register', register);
 // router.post('/registerMail', (req, res) => {
 //   res.json('Hello World');
 // });
-router.post('authenticate', (req, res) => {
+router.post('/authenticate', (req, res) => {
   res.json('Hello World');
 });
-router.post('/login', login);
+router.post('/login', verifyUser, login);
 
 // GET Methods
 router.get('/user/:username', getUser);
@@ -28,8 +30,8 @@ router.get('/verifyOTP', verifyOTP);
 router.get('/resetSession', resetSession);
 
 // PUT Methods
-router.put('/updateUser', updateUser);
+router.put('/user', authenticate, updateUser);
 
-router.put('/resetPassword', resetPassword);
+router.put('/password/reset', resetPassword);
 
 export default router;
