@@ -8,30 +8,34 @@ import otpGenerator from 'otp-generator';
 // Register a new user
 export async function register(req, res) {
   const { username, email, password, profile } = req.body;
+
   if (!username || !email || !password) {
     return res.status(400).json({ message: 'Please enter all fields' });
   }
-  const userNameExist = await User.findOne({ username });
-  const emailExist = await User.findOne({ email });
-
-  if (userNameExist) {
-    return res.status(409).json({ message: 'Username already exist' });
-  }
-  if (emailExist) {
-    return res.status(409).json({ message: 'Email already exist' });
-  }
-
-  const newUser = new User({
-    username,
-    email,
-    password: await bcrypt.hash(password, 10),
-    profile: profile || '',
-  });
   try {
+    const userNameExist = await User.findOne({ username });
+    const emailExist = await User.findOne({ email });
+
+    if (userNameExist) {
+      return res.status(409).json({ message: 'Username already exist' });
+    }
+    if (emailExist) {
+      return res.status(409).json({ message: 'Email already exist' });
+    }
+
+    const newUser = new User({
+      username,
+      email,
+      password: await bcrypt.hash(password, 10),
+      profile: profile || '',
+    });
+
     await newUser.save();
     return res.status(201).json({ message: 'User registered successfully' });
   } catch (error) {
-    return res.status(500).send({ message: 'Server Error' });
+    return res
+      .status(500)
+      .send({ message: 'Server Error', error: error.message });
   }
 }
 
@@ -68,7 +72,7 @@ export async function login(req, res) {
 export async function getUser(req, res) {
   const { username } = req.params;
   if (!username) {
-    return res.status(501).json({ message: 'Invalid Username' });
+    return res.status(400).json({ message: 'Invalid Username' });
   }
   try {
     const user = await User.findOne({ username });
@@ -81,7 +85,9 @@ export async function getUser(req, res) {
 
     return res.status(200).json(rest);
   } catch (error) {
-    return res.status(500).send({ message: 'Server Error' });
+    return res
+      .status(500)
+      .json({ message: 'Server Error', error: error.message });
   }
 }
 
@@ -107,7 +113,9 @@ export async function updateUser(req, res) {
     });
     return res.status(200).json({ message: 'User updated successfully' });
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return res
+      .status(500)
+      .json({ message: 'Server Error', error: error.message });
   }
 }
 
@@ -130,7 +138,7 @@ export async function verifyOTP(req, res) {
     req.app.locals.resetSession = true;
     return res.status(201).json({ message: 'OTP verified successfully' });
   }
-  return res.status(400).json({ message: 'Invalid OTP' });
+  return res.status(403).json({ message: 'Invalid OTP' });
 }
 
 // GET http://localhost:5000/api/resetsession
@@ -161,6 +169,8 @@ export async function resetPassword(req, res) {
 
     return res.status(201).json({ message: 'Password reset successful' });
   } catch (error) {
-    return res.status(500).json({ message: 'Server Error' });
+    return res
+      .status(500)
+      .json({ message: 'Server Error', error: error.message });
   }
 }

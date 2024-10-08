@@ -1,11 +1,15 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import avatar from '../assets/profile.png';
 import { useFormik } from 'formik';
 import { validateUsername } from '../helpers/validate';
 
 import styles from '../styles/Username.module.css';
+import { useAuthStore } from '../store/store';
 
 function Username() {
+  const navigate = useNavigate();
+  const setUserName = useAuthStore((state) => state.setUserName);
+
   const formik = useFormik({
     initialValues: {
       username: '',
@@ -14,7 +18,8 @@ function Username() {
     validateOnBlur: false,
     validateOnChange: false,
     onSubmit: async (values) => {
-      console.log(values);
+      setUserName(values.username);
+      navigate('/password');
     },
   });
 
