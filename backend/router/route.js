@@ -1,4 +1,5 @@
 import { Router } from 'express';
+const router = Router();
 import {
   generateOTP,
   getUser,
@@ -9,15 +10,13 @@ import {
   updateUser,
   verifyOTP,
 } from '../controllers/app.controller.js';
+import { registerMail } from '../controllers/mail.controller.js';
 import { verifyUser } from '../middleware/verifyUser.js';
 import { authenticate, localVariables } from '../middleware/authenticate.js';
-const router = Router();
 
 // POST Methods
 router.post('/register', register);
-// router.post('/registerMail', (req, res) => {
-//   res.json('Hello World');
-// });
+router.post('/registermail', registerMail);
 router.post('/authenticate', (req, res) => {
   res.json('Hello World');
 });
