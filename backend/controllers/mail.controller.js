@@ -8,8 +8,8 @@ let nodeConfig = {
   port: 587,
   secure: false,
   auth: {
-    user: `${process.env.EMAIL}`,
-    pass: `${process.env.EMAIL_PASSWORD}`,
+    user: process.env.EMAIL,
+    pass: process.env.EMAIL_PASSWORD,
   },
 };
 

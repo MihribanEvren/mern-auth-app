@@ -25,7 +25,7 @@ function Username() {
 
   return (
     <div className="container mx-auto">
-      <div className="flex flex-col items-center justify-center h-screen">
+      <div className="flex flex-col items-center justify-center">
         <div className={styles.glass}>
           <div className="flex flex-col items-center title">
             <h4 className="text-5xl font-bold">Hello Again!</h4>

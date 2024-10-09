@@ -145,8 +145,7 @@ export async function verifyOTP(req, res) {
 // succesfully redirect user when OTP is reset
 export async function resetSession(req, res) {
   if (req.app.locals.resetSession) {
-    req.app.locals.resetSession = false;
-    return res.status(201).json({ message: 'Access Granted' });
+    return res.status(201).json({ flag: req.app.locals.resetSession });
   }
   return res.status(440).json({ message: 'Session expired' });
 }

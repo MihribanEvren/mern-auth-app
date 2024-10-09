@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import avatar from '../assets/profile.png';
 import { useFormik } from 'formik';
 import { validateProfile } from '../helpers/validate';
@@ -8,24 +8,39 @@ import extend from '../styles/Profile.module.css';
 
 import { useState } from 'react';
 import convertImageToBase64 from '../helpers/convert';
+import { useFetch } from '../hooks/fetch.hook';
+import { updateUser } from '../helpers/helper';
+import toast from 'react-hot-toast';
 
 function Profile() {
-  const [file, setFile] = useState();
+  const [file, setFile] = useState(null);
+  const { apiData, isLoading, error } = useFetch();
+  const navigate = useNavigate();
 
   const formik = useFormik({
     initialValues: {
-      firstName: '',
-      lastName: '',
-      phone: '',
-      address: '',
-      email: '',
+      firstName: apiData?.firstName || '',
+      lastName: apiData?.lastName || '',
+      phone: apiData?.phone || '',
+      address: apiData?.address || '',
+      email: apiData?.email || '',
     },
+    enableReinitialize: true,
     validate: validateProfile,
     validateOnBlur: false,
     validateOnChange: false,
     onSubmit: async (values) => {
-      values = await Object.assign(values, { profile: file || '' });
-      console.log(values);
+      const updatedValues = {
+        ...values,
+        profile: file || apiData?.profile || '',
+      };
+
+      const updatedUser = updateUser(updatedValues);
+      toast.promise(updatedUser, {
+        loading: 'Updating...',
+        success: <b>Updated successfully</b>,
+        error: <b>Failed to update</b>,
+      });
     },
   });
 
@@ -35,11 +50,23 @@ function Profile() {
     setFile(base64);
   };
 
+  const logout = () => {
+    localStorage.removeItem('token');
+    navigate('/');
+  };
+
+  if (isLoading) {
+    return <h1 className="text-2xl font-bold">Loading...</h1>;
+  }
+  if (error) {
+    return <h1 className="text-xl text-red-500">{error.message}</h1>;
+  }
+
   return (
     <div className="container mx-auto">
       <div className="flex flex-col items-center justify-center">
         <div
-          className={`${styles.glass} ${extend.glass} h-screen py-12 w-2/5 sm:w-3/5 lg:w-2/5`}
+          className={`${styles.glass} ${extend.glass} py-12 w-2/5 sm:w-3/5 lg:w-2/5`}
         >
           <div className="flex flex-col items-center title">
             <h4 className="text-5xl font-bold">Profile</h4>
@@ -51,7 +78,7 @@ function Profile() {
             <div className="flex justify-center profile">
               <label htmlFor="profile">
                 <img
-                  src={file || avatar}
+                  src={apiData?.profile || file || avatar}
                   className={`${styles.profile_img} ${extend.profile_img}`}
                   alt="avatar"
                 />
@@ -109,9 +136,9 @@ function Profile() {
             <div className="mt-4 text-center">
               <span className="text-gray-600 ">
                 Come Back Later?{' '}
-                <Link className="text-pink-600" to="/">
+                <button onClick={logout} className="text-pink-600" to="/">
                   Log out
-                </Link>
+                </button>
               </span>
             </div>
           </form>

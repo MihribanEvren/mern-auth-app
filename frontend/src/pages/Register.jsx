@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import avatar from '../assets/profile.png';
 import { useFormik } from 'formik';
 import { validateRegister } from '../helpers/validate';
@@ -6,8 +6,11 @@ import { validateRegister } from '../helpers/validate';
 import styles from '../styles/Username.module.css';
 import { useState } from 'react';
 import convertImageToBase64 from '../helpers/convert';
+import { registerUser } from '../helpers/helper';
+import toast from 'react-hot-toast';
 
 function Register() {
+  const navigate = useNavigate();
   const [file, setFile] = useState();
 
   const formik = useFormik({
@@ -21,7 +24,9 @@ function Register() {
     validateOnChange: false,
     onSubmit: async (values) => {
       values = await Object.assign(values, { profile: file || '' });
-      console.log(values);
+      registerUser(values);
+      toast.success('Registered successfully');
+      navigate('/');
     },
   });
 

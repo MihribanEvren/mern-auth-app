@@ -1,10 +1,19 @@
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 
 axios.defaults.baseURL = 'http://localhost:5000';
 
 // API Requests
 
-// Authentica function
+// To get username from token
+export const getUsername = async () => {
+  const token = localStorage.getItem('token');
+  if (!token) return { error: 'Token not found' };
+  let decoded = jwtDecode(token);
+  return decoded;
+};
+
+// Authenticate function
 export const authenticate = async (username) => {
   try {
     return await axios.post('/api/authenticate', {
@@ -80,9 +89,7 @@ export const generateOTP = async (username) => {
       status,
     } = await axios.get('/api/generateotp', { params: { username } });
     if (status === 201) {
-      let {
-        data: { email },
-      } = await getUser({ username });
+      const { email } = await getUser(username);
       let text = `Your OTP is ${code}. Please do not share it with anyone.`;
       await axios.post('/api/registermail', {
         username,
@@ -93,7 +100,7 @@ export const generateOTP = async (username) => {
     }
     return { code };
   } catch (error) {
-    return { error: error.response.data.message };
+    return { error: error.response?.data?.message || 'OTP generation failed' };
   }
 };
 
