@@ -11,7 +11,7 @@ import { useFetch } from '../hooks/fetch.hook';
 function Reset() {
   const { username } = useAuthStore((state) => state.auth);
   const navigate = useNavigate();
-  const { apiData, isLoading, status, error } = useFetch('resetsession');
+  const { isLoading, status, error } = useFetch('resetsession');
 
   const formik = useFormik({
     initialValues: {
