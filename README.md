@@ -1,4 +1,4 @@
-# Login App
+# Full Stack Login App
 
 The Login App is a user authentication application that enables users to register, log in, update their profiles, reset their passwords via email, and upload profile pictures. It is built using the MERN stack, providing a seamless experience for user management.
 
